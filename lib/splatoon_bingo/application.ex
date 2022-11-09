@@ -14,8 +14,7 @@ defmodule SplatoonBingo.Application do
       {Phoenix.PubSub, name: SplatoonBingo.PubSub},
       # Start the Endpoint (http/https)
       SplatoonBingoWeb.Endpoint
-      # Start a worker by calling: SplatoonBingo.Worker.start_link(arg)
-      # {SplatoonBingo.Worker, arg}
+      {Task, fn -> shutdown_when_inactive(:timer.minutes(10)) end},
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -31,4 +30,13 @@ defmodule SplatoonBingo.Application do
     SplatoonBingoWeb.Endpoint.config_change(changed, removed)
     :ok
   end
+
+  defp shutdown_when_inactive(every_ms) do
+    Process.sleep(every_ms)
+
+    if :ranch.procs(SplatoonBingoWeb.Endpoint.HTTP, :connections) == [] do
+      System.stop(0)
+    else
+      shutdown_when_inactive(every_ms)
+    end
 end
