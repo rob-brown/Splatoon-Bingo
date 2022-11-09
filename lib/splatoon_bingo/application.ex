@@ -13,8 +13,8 @@ defmodule SplatoonBingo.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: SplatoonBingo.PubSub},
       # Start the Endpoint (http/https)
-      SplatoonBingoWeb.Endpoint
-      {Task, fn -> shutdown_when_inactive(:timer.minutes(10)) end},
+      SplatoonBingoWeb.Endpoint,
+      {Task, fn -> shutdown_when_inactive(:timer.minutes(10)) end}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -39,4 +39,5 @@ defmodule SplatoonBingo.Application do
     else
       shutdown_when_inactive(every_ms)
     end
+  end
 end
