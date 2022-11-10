@@ -3,14 +3,22 @@ defmodule SplatoonBingoWeb.BingoLive do
 
   require Logger
 
+  import Phoenix.LiveView.Helpers
+
   alias SplatoonBingo.BingoBoard
   alias SplatoonBingoWeb.BingoView
 
   @impl true
-  def mount(params, _session, socket) do
-    seed = parse_seed(params["seed"]) || random_seed()
+  def mount(%{"seed" => seed}, _session, socket) do
+    seed = String.to_integer(seed)
     board = generate_board(seed)
     socket = assign(socket, seed: seed, board: board)
+    {:ok, socket}
+  end
+
+  def mount(params, _session, socket) do
+    seed = random_seed()
+    socket = push_redirect(socket, to: "/?seed=#{seed}")
     {:ok, socket}
   end
 
@@ -23,10 +31,7 @@ defmodule SplatoonBingoWeb.BingoLive do
 
     <p>Click a cell to toggle it marked or locked</p>
 
-    <div class="button-area">
-      <a href={"/?seed=#{random_seed()}"}><button>New Board</button></a>
-      <a href={"/?seed=#{@seed}"}><button>Save Board to URL</button></a>
-    </div>
+    <%= live_patch "Create New Board", to: "/?seed=#{@seed + 1}" %>
 
     <h2>Rules</h2>
 
@@ -51,6 +56,19 @@ defmodule SplatoonBingoWeb.BingoLive do
 
   def handle_event(event, params, socket) do
     Logger.warn("Unhandled event #{inspect({event, params})}")
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_params(%{"seed" => seed}, _uri, socket) do
+    seed = String.to_integer(seed)
+    board = generate_board(seed)
+    socket = assign(socket, seed: seed, board: board)
+
+    {:noreply, socket}
+  end
+
+  def handle_params(_params, _uri, socket) do
     {:noreply, socket}
   end
 
