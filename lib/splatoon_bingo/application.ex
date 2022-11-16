@@ -13,7 +13,8 @@ defmodule SplatoonBingo.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: SplatoonBingo.PubSub},
       # Start the Endpoint (http/https)
-      SplatoonBingoWeb.Endpoint
+      SplatoonBingoWeb.Endpoint,
+      SplatoonBingo.Broker
       # Disabled for now. Shutdown only works with fly machines.
       # {Task, fn -> shutdown_when_inactive(:timer.minutes(10)) end}
     ]

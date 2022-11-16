@@ -6,17 +6,18 @@ defmodule SplatoonBingoWeb.BingoLive do
   import Phoenix.LiveView.Helpers
 
   alias SplatoonBingo.BingoBoard
+  alias SplatoonBingo.Broker
   alias SplatoonBingoWeb.BingoView
 
   @impl true
   def mount(%{"seed" => seed}, _session, socket) do
     seed = String.to_integer(seed)
-    board = generate_board(seed)
+    board = Broker.register(seed)
     socket = assign(socket, seed: seed, board: board)
     {:ok, socket}
   end
 
-  def mount(params, _session, socket) do
+  def mount(_params, _session, socket) do
     seed = random_seed()
     socket = push_redirect(socket, to: "/?seed=#{seed}")
     {:ok, socket}
@@ -30,6 +31,7 @@ defmodule SplatoonBingoWeb.BingoLive do
     <BingoView.board board={@board}/>
 
     <p>Click a cell to toggle it marked or locked</p>
+    <p>Share the URL to work on a board with others</p>
 
     <%= live_patch "Create New Board", to: "/?seed=#{@seed + 1}" %>
 
@@ -48,8 +50,9 @@ defmodule SplatoonBingoWeb.BingoLive do
 
   @impl true
   def handle_event("change-weapon-state", %{"name" => name}, socket) do
+    seed = socket.assigns.seed
     board = BingoBoard.change_weapon_state(socket.assigns.board, name)
-    socket = assign(socket, board: board)
+    Broker.notify(seed, board)
 
     {:noreply, socket}
   end
@@ -61,8 +64,10 @@ defmodule SplatoonBingoWeb.BingoLive do
 
   @impl true
   def handle_params(%{"seed" => seed}, _uri, socket) do
+    old_seed = socket.assigns.seed
+    Broker.unregister(old_seed)
     seed = String.to_integer(seed)
-    board = generate_board(seed)
+    board = Broker.register(seed)
     socket = assign(socket, seed: seed, board: board)
 
     {:noreply, socket}
@@ -72,24 +77,24 @@ defmodule SplatoonBingoWeb.BingoLive do
     {:noreply, socket}
   end
 
-  defp random_seed() do
-    :erlang.monotonic_time()
-  end
-
-  defp parse_seed(string) when is_binary(string) do
-    case Integer.parse(string) do
-      {n, _} ->
-        n
-
-      _ ->
-        nil
+  @impl true
+  def handle_info({:broadcast, seed, board}, socket) do
+    if seed == socket.assigns.seed do
+      {:noreply, assign(socket, board: board)}
+    else
+      {:noreply, socket}
     end
   end
 
-  defp parse_seed(_), do: nil
+  @impl true
+  def terminate(_reason, socket) do
+    seed = socket.assigns.seed
+    Logger.info("Terminating #{seed}")
+    Broker.unregister(seed)
+    :ok
+  end
 
-  defp generate_board(seed) when is_integer(seed) do
-    :rand.seed(:exsss, seed)
-    BingoBoard.new()
+  defp random_seed() do
+    :erlang.monotonic_time()
   end
 end
