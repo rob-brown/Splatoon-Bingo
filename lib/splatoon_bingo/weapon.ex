@@ -267,6 +267,71 @@ defmodule SplatoonBingo.Weapon do
         name: "Splattershot Pro",
         image: "Splattershot_Pro.png",
         state: :empty
+      },
+      %SplatoonBingo.Weapon{
+        name: "Splattershot Nova",
+        image: "Splattershot_Nova.png",
+        state: :empty
+      },
+      %SplatoonBingo.Weapon{
+        name: "Zink Mini Splatling",
+        image: "Zink_Mini_Splatling.png",
+        state: :empty
+      },
+      %SplatoonBingo.Weapon{
+        name: "Custom Splattershot Jr.",
+        image: "Custom_Splattershot_Jr..png",
+        state: :empty
+      },
+      %SplatoonBingo.Weapon{
+        name: "Dapple Dualies Nouveau",
+        image: "Dapple_Dualies_Nouveau.png",
+        state: :empty
+      },
+      %SplatoonBingo.Weapon{
+        name: "Big Swig Roller",
+        image: "Big_Swig_Roller.png",
+        state: :empty
+      },
+      %SplatoonBingo.Weapon{
+        name: "Luna Blaster Neo",
+        image: "Luna_Blaster_Neo.png",
+        state: :empty
+      },
+      %SplatoonBingo.Weapon{
+        name: "Carbon Roller Deco",
+        image: "Carbon_Roller_Deco.png",
+        state: :empty
+      },
+      %SplatoonBingo.Weapon{
+        name: "Snipewriter 5H",
+        image: "Snipewriter_5H.png",
+        state: :empty
+      },
+      %SplatoonBingo.Weapon{
+        name: "Tentatek Splattershot",
+        image: "Tentatek_Splattershot.png",
+        state: :empty
+      },
+      %SplatoonBingo.Weapon{
+        name: "Slosher Deco",
+        image: "Slosher_Deco.png",
+        state: :empty
+      },
+      %SplatoonBingo.Weapon{
+        name: "Forge Splattershot Pro",
+        image: "Forge_Splattershot_Pro.png",
+        state: :empty
+      },
+      %SplatoonBingo.Weapon{
+        name: "Inkbrush Nouveau",
+        image: "Inkbrush_Nouveau.png",
+        state: :empty
+      },
+      %SplatoonBingo.Weapon{
+        name: "Aerospray RG",
+        image: "Aerospray_RG.png",
+        state: :empty
       }
     ]
   end
