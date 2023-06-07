@@ -30,8 +30,8 @@ defmodule SplatoonBingo.Application do
     :ok
   end
 
-  defp shutdown_when_inactive(every_ms) do
-    Process.sleep(every_ms)
+  defp shutdown_when_inactive(delay_ms) do
+    Process.sleep(delay_ms)
 
     connections = :ranch.procs(SplatoonBingoWeb.Endpoint.HTTP, :connections)
 
@@ -40,8 +40,8 @@ defmodule SplatoonBingo.Application do
       Process.sleep(:timer.seconds(3))
       System.stop(0)
     else
-      Logger.warn("Idle check: #{length(connections)} connections open, checking again in #{every_ms} ms.")
-      shutdown_when_inactive(every_ms)
+      Logger.warn("Idle check: #{length(connections)} connections open, checking again in #{delay_ms} ms.")
+      shutdown_when_inactive(delay_ms)
     end
   end
 end
