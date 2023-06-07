@@ -1,9 +1,9 @@
 defmodule SplatoonBingo.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   use Application
+
+  require Logger
 
   @impl true
   def start(_type, _args) do
@@ -12,15 +12,12 @@ defmodule SplatoonBingo.Application do
       SplatoonBingoWeb.Telemetry,
       # Start the PubSub system
       {Phoenix.PubSub, name: SplatoonBingo.PubSub},
-      # Start the Endpoint (http/https)
+      # Start the Endpoint 
       SplatoonBingoWeb.Endpoint,
-      SplatoonBingo.Broker
-      # Disabled for now. Shutdown only works with fly machines.
-      # {Task, fn -> shutdown_when_inactive(:timer.minutes(10)) end}
+      SplatoonBingo.Broker,
+      {Task, fn -> shutdown_when_inactive(:timer.minutes(10)) end}
     ]
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: SplatoonBingo.Supervisor]
     Supervisor.start_link(children, opts)
   end
@@ -36,9 +33,14 @@ defmodule SplatoonBingo.Application do
   defp shutdown_when_inactive(every_ms) do
     Process.sleep(every_ms)
 
-    if :ranch.procs(SplatoonBingoWeb.Endpoint.HTTP, :connections) == [] do
+    connections = :ranch.procs(SplatoonBingoWeb.Endpoint.HTTP, :connections)
+
+    if connections == [] do
+      Logger.warn("Server idle, shutting down in 3 seconds")
+      Process.sleep(:timer.seconds(3))
       System.stop(0)
     else
+      Logger.warn("Idle check: #{length(connections)} connections open, checking again in #{every_ms} ms.")
       shutdown_when_inactive(every_ms)
     end
   end
